@@ -1,38 +1,64 @@
 from dotenv import load_dotenv
-from weaviate_handler import connect_to_weaviate, get_or_create_collection, retrieve_chunks
+
+# Import functions from our modules
+from pdf_processor import process_pdfs_in_directory
+from weaviate_handler import (
+    connect_to_weaviate, 
+    get_or_create_collection, 
+    ingest_data,
+    retrieve_chunks
+)
 from gemini_handler import configure_gemini, generate_answer
+
 
 def main():
     """
-    Main function to orchestrate the RAG workflow.
+    Main function to orchestrate the PDF ingestion and RAG workflow.
     """
-    # --- Environment and API Setup ---
     load_dotenv()
 
+    # --- Configuration ---
+    # Set to True to delete the existing Weaviate collection and re-ingest all PDFs.
+    # Set to False to use the existing data and just ask questions.
+    PERFORM_INGESTION = False 
+    PDF_DIRECTORY = r"C:\VITC_ChatBot_backend\VITC_ChatBot\Backend\data" # The folder containing your PDF files
+    
+    # --- API and DB Setup ---
     if not configure_gemini():
         return # Exit if Gemini config fails
-
     client = connect_to_weaviate()
     if not client:
         return # Exit if Weaviate connection fails
-    
+
     try:
-        # --- Collection Setup ---
         collection_name = "VIT_docs"
-        documents_collection = get_or_create_collection(client, collection_name)
-        if not documents_collection:
-            return # Exit if collection setup fails
+        # Get or create the collection, deleting it first if PERFORM_INGESTION is True
+        documents_collection = get_or_create_collection(
+            client, 
+            collection_name, 
+            fresh_start=PERFORM_INGESTION
+        )
+        if documents_collection is None:
+            return 
+
+        # --- Data Ingestion Step ---
+        if PERFORM_INGESTION:
+            # Process all PDFs in the specified directory
+            data_to_ingest = process_pdfs_in_directory(PDF_DIRECTORY)
+            # Ingest the processed data into Weaviate
+            ingest_data(documents_collection, data_to_ingest)
 
         # --- RAG (Retrieval-Augmented Generation) Workflow ---
+        print("\n--- Ready to answer questions ---")
         
-        # 1. User Query
-        query_text = "What is the capital of France and what is it known for?"
+        # Example Query
+        query_text = input("Enter query : ")
         print(f"\nUser Query: '{query_text}'")
 
-        # 2. Retrieval from Weaviate
-        retrieved_chunks = retrieve_chunks(documents_collection, query_text)
-
-        # 3. Generation with Gemini
+        # 1. Retrieve relevant context from Weaviate
+        retrieved_chunks = retrieve_chunks(documents_collection, query_text, limit=5)
+        
+        # 2. Generate an answer using Gemini with the retrieved context
         final_answer = generate_answer(retrieved_chunks, query_text)
         
         print("\n--- Final Answer ---")
