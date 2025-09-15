@@ -1,17 +1,17 @@
 from dotenv import load_dotenv
 
 # Import functions from our modules
-from pdf_processor import process_pdfs_in_directory
-from weaviate_handler import (
+from .pdf_processor import process_pdfs_in_directory
+from .weaviate_handler import (
     connect_to_weaviate, 
     get_or_create_collection, 
     ingest_data,
     retrieve_chunks
 )
-from gemini_handler import configure_gemini, generate_answer
+from .gemini_handler import configure_gemini, generate_answer
 
 
-def main():
+def query(user_query : str):
     """
     Main function to orchestrate the PDF ingestion and RAG workflow.
     """
@@ -52,19 +52,15 @@ def main():
         print("\n--- Ready to answer questions ---")
         
         # Example Query
-        query_text = input("Enter query : ")
-        print(f"\nUser Query: '{query_text}'")
+        print(f"\nUser Query: '{user_query}'")
 
         # 1. Retrieve relevant context from Weaviate
-        retrieved_chunks = retrieve_chunks(documents_collection, query_text, limit=5)
+        retrieved_chunks = retrieve_chunks(documents_collection, user_query, limit=5)
         
         # 2. Generate an answer using Gemini with the retrieved context
-        final_answer = generate_answer(retrieved_chunks, query_text)
+        final_answer = generate_answer(retrieved_chunks, user_query)
         
-        print("\n--- Final Answer ---")
-        print(final_answer)
-        print("--------------------")
-
+        return final_answer
     except Exception as e:
         print(f"❌ An unexpected error occurred in the main workflow: {e}")
 
@@ -75,5 +71,3 @@ def main():
             print("\nConnection to Weaviate closed.")
 
 
-if __name__ == "__main__":
-    main()
