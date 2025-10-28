@@ -12,6 +12,7 @@ app.add_middleware(
         "http://127.0.0.1:8080",
         "http://localhost:5173",  # Alternative Vite port
         "http://127.0.0.1:5173",
+        "https://vitc-chat-bot-frontend.vercel.app/"
     ],
     allow_credentials=True,
     allow_methods=["*"],
