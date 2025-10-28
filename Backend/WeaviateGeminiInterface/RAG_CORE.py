@@ -20,8 +20,8 @@ def query(user_query : str):
     # --- Configuration ---
     # Set to True to delete the existing Weaviate collection and re-ingest all PDFs.
     # Set to False to use the existing data and just ask questions.
-    PERFORM_INGESTION = False 
-    PDF_DIRECTORY = r"C:\VITC_ChatBot_backend\VITC_ChatBot\Backend\data" # The folder containing your PDF files
+    PERFORM_INGESTION = False
+    PDF_DIRECTORY = r"/Users/sharvajvidyutgmail.com/projects/VITC_ChatBot_frontend/Backend/data" # The folder containing your PDF files
     
     # --- API and DB Setup ---
     if not configure_gemini():
