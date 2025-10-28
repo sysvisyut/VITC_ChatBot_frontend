@@ -2,7 +2,7 @@ import axios from "axios";
 import { ApiResponse } from "@/types/chat";
 
 // Make this configurable through environment variables
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export const chatApi = {
   async sendMessage(query: string): Promise<ApiResponse> {
