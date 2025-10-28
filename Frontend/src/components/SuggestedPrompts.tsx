@@ -6,11 +6,11 @@ interface SuggestedPromptsProps {
 }
 
 const suggestions = [
-  "What are the hostel facilities at VIT Chennai?",
+  "What are the hostel rules at VIT Chennai?",
   "Tell me about the placement process",
-  "What clubs and organizations are available?",
+  "Where is Dr Prasanna J's cabin?",
   "How do I register for courses?",
-  "What are the library timings?",
+  "What are the hostel timings?",
   "Explain the grading system",
 ];
 
